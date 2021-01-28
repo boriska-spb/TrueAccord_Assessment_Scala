@@ -1,16 +1,15 @@
 import util.{ Failure, Success, Try, Using}
-import java.util.Date
-import java.text.SimpleDateFormat
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 import net.liftweb.json._
 import net.liftweb.json.DefaultFormats
-import net.liftweb.json.JObject
 import Config._
 
 import scala.annotation.tailrec
 
 
 object APIAccess {
-  implicit val formats = DefaultFormats
+  implicit val formats:DefaultFormats = DefaultFormats
 
   // ===== API Data objects ========================
 
@@ -48,11 +47,11 @@ object APIAccess {
 
   // ===== Conversions ============================================
 
-  def ParseDateOpt(str:String) : Option[Date] = {
+  def ParseDateOpt(str:String) : Option[LocalDate] = {
     @tailrec
-    def _parseHead(formats: List[SimpleDateFormat]): Option[Date] = formats match {
+    def _parseHead(formats: List[DateTimeFormatter]): Option[LocalDate] = formats match {
       case Nil => None
-      case x :: xs => Try { x.parse(str) } match {
+      case x :: xs => Try { LocalDate.parse(str) } match {
         case Success(date) => Some(date)
         case Failure(err) => _parseHead(formats.tail)
       }
@@ -63,12 +62,12 @@ object APIAccess {
 
   def InstallmentPeriodInDaysOpt(frequency:String):Option[Int] = frequency match {
     case "WEEKLY" => Some(7)
-    case "BY_WEEKLY" => Some(14)
+    case "BI_WEEKLY" => Some(14)
     case _ => None
   }
 
   def FetchDebts(debt_id:Option[Int]=None) : List[Debt] = {
-    val param = debt_id.fold("")(i => f"?id = $i")
+    val param = debt_id.fold("")(i => f"?id=$i")
     Using(io.Source.fromURL(URL_Debts + param)) { src =>
       val json = parse(src.mkString)
       json.extract[List[Debt]]
@@ -79,7 +78,7 @@ object APIAccess {
   }
 
   def FetchPaymentPlans(debt_id:Option[Int]=None) : List[PaymentPlan] = {
-    val param = debt_id.fold("")(i => f"?debt_id = $i")
+    val param = debt_id.fold("")(i => f"?debt_id=$i")
     Using(io.Source.fromURL(URL_PaymentPlans + param)) { src =>
       val json = parse(src.mkString)
       json.extract[List[PaymentPlan]]
@@ -90,7 +89,7 @@ object APIAccess {
   }
 
   def FetchPayments(payment_plan_id:Option[Int]=None) : List[Payment] = {
-    val param = payment_plan_id.fold("")(i => f"?payment_plan_id = $i")
+    val param = payment_plan_id.fold("")(i => f"?payment_plan_id=$i")
     Using(io.Source.fromURL(URL_Payments + param)) { src =>
       val json = parse(src.mkString)
       json.extract[List[Payment]]
