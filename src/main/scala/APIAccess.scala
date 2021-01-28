@@ -68,8 +68,15 @@ object APIAccess {
 
   // ===== Mock API ==============================================
   import util.DynamicVariable
-  import MockAPI.MockURL
-  private val _mockURL = new DynamicVariable[Option[MockURL]](None)
+  import MockAPI.fromURL
+
+  /**
+   * Optional mock function : URL => response as JSON string
+   * SetMockURL : defaults to MockAPI.fromURL
+   */
+  private val _mockURL = new DynamicVariable[Option[String => String]](None)
+  def SetMockURL(mock:Boolean, mockFunction:String=>String=fromURL):Unit =
+    _mockURL.value = if (mock) Some(fromURL) else None
 
 
   // ===== API Requests ==========================================
@@ -85,7 +92,7 @@ object APIAccess {
   def HTTPRequest(url:String) : JValue = {
     val json_string = _mockURL.value match {
       // --- use mock API
-      case Some(mock) => mock.fromURL(url)
+      case Some(mock) => mock(url)
 
       // --- use io.Source.fromURL
       case _ => Using(io.Source.fromURL(url)) { src => src.mkString } match {
