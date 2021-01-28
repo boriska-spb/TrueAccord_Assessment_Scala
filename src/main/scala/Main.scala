@@ -2,6 +2,8 @@ import java.time.LocalDate
 import java.time.Period
 import APIAccess._
 
+import java.time.temporal.ChronoUnit
+
 object Main extends App {
   /**
    * Basic Debt Info Report : id, amount, in-payment-plan
@@ -57,7 +59,7 @@ object Main extends App {
               case Some(start_date) =>
                 APIAccess.InstallmentPeriodInDaysOpt(plan.installment_frequency) match {
                   case Some(period) =>
-                    val elapsed_days = Period.between(start_date, LocalDate.now()).getDays
+                    val elapsed_days = ChronoUnit.DAYS.between(start_date, LocalDate.now())
                     val nperiods = if (elapsed_days % period == 0) elapsed_days / period else elapsed_days / period + 1
                     val next_pmt_due = start_date.plusDays(nperiods * period)
                     next_pmt_due.toString
