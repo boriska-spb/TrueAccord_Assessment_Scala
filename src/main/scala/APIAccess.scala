@@ -1,7 +1,6 @@
-import scala.util.{Failure, Success, Try}
+import util.{ Failure, Success, Try, Using}
 import java.util.Date
 import java.text.SimpleDateFormat
-import util.DynamicVariable
 import net.liftweb.json._
 import net.liftweb.json.DefaultFormats
 import net.liftweb.json.JObject
@@ -15,18 +14,18 @@ object APIAccess {
 
   // ===== API Data objects ========================
 
-  case class Debt(val amount:Float,
-                  val id:Int)
+  case class Debt(amount:Float,
+                  id:Int)
   {
     override def toString = f"{amount:$amount, id:$id}"
   }
 
-  case class PaymentPlan(val amount_to_pay: Float,
-                         val debt_id: Int,
-                         val id:Int,
-                         val installment_amount: Float,
-                         val installment_frequency: String,
-                         val start_date : String)
+  case class PaymentPlan(amount_to_pay: Float,
+                         debt_id: Int,
+                         id:Int,
+                         installment_amount: Float,
+                         installment_frequency: String,
+                         start_date : String)
   {
     override def toString: String =
       "{" +
@@ -39,9 +38,9 @@ object APIAccess {
       "}"
   }
 
-  case class Payment(val amount : Float,
-                     val date   : String,
-                     val payment_plan_id : Int)
+  case class Payment(amount : Float,
+                     date   : String,
+                     payment_plan_id : Int)
   {
     override def toString = f"{amount : $amount, date : $date, payment_plan_id : $payment_plan_id}"
   }
@@ -51,48 +50,53 @@ object APIAccess {
 
   def ParseDateOpt(str:String) : Option[Date] = {
     @tailrec
-    def _parse(formats: List[SimpleDateFormat]): Option[Date] = formats match {
+    def _parseHead(formats: List[SimpleDateFormat]): Option[Date] = formats match {
       case Nil => None
       case x :: xs => Try { x.parse(str) } match {
         case Success(date) => Some(date)
-        case Failure(err) => _parse(formats.tail)
+        case Failure(err) => _parseHead(formats.tail)
       }
     }
 
-    _parse(DateFormats)
+    _parseHead(DateFormats)
   }
 
   def InstallmentPeriodInDaysOpt(frequency:String):Option[Int] = frequency match {
     case "WEEKLY" => Some(7)
     case "BY_WEEKLY" => Some(14)
-    case f@_ => None
+    case _ => None
   }
 
   def FetchDebts(debt_id:Option[Int]=None) : List[Debt] = {
-    val param = debt_id match {
-      case Some(i) => f"?id = $i"
-      case _ => ""
+    val param = debt_id.fold("")(i => f"?id = $i")
+    Using(io.Source.fromURL(URL_Debts + param)) { src =>
+      val json = parse(src.mkString)
+      json.extract[List[Debt]]
+    } match {
+      case Success(value) => value
+      case Failure(exception) => throw exception
     }
-
-    val json = parse(io.Source.fromURL(URL_Debts + param).mkString)
-    json.extract[List[Debt]]
   }
 
   def FetchPaymentPlans(debt_id:Option[Int]=None) : List[PaymentPlan] = {
-    val param = debt_id match {
-      case Some(i) => f"?debt_id = $i"
-      case _ => ""
+    val param = debt_id.fold("")(i => f"?debt_id = $i")
+    Using(io.Source.fromURL(URL_PaymentPlans + param)) { src =>
+      val json = parse(src.mkString)
+      json.extract[List[PaymentPlan]]
+    } match {
+      case Success(value) => value
+      case Failure(exception) => throw exception
     }
-    val json = parse(io.Source.fromURL(URL_PaymentPlans + param).mkString)
-    json.extract[List[PaymentPlan]]
   }
 
   def FetchPayments(payment_plan_id:Option[Int]=None) : List[Payment] = {
-    val param = payment_plan_id match {
-      case Some(i) => f"?payment_plan_id = $i"
-      case _ => ""
+    val param = payment_plan_id.fold("")(i => f"?payment_plan_id = $i")
+    Using(io.Source.fromURL(URL_Payments + param)) { src =>
+      val json = parse(src.mkString)
+      json.extract[List[Payment]]
+    } match {
+      case Success(value) => value
+      case Failure(exception) => throw exception
     }
-    val json = parse(io.Source.fromURL(URL_Payments + param).mkString)
-    json.extract[List[Payment]]
   }
 }
