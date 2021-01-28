@@ -1,8 +1,7 @@
 import java.time.LocalDate
-import java.time.Period
+import java.time.temporal.ChronoUnit
 import APIAccess._
 
-import java.time.temporal.ChronoUnit
 
 object Main extends App {
   /**

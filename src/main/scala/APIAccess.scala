@@ -9,7 +9,7 @@ import scala.annotation.tailrec
 
 
 object APIAccess {
-  implicit val formats:DefaultFormats = DefaultFormats
+
 
   // ===== API Data objects ========================
 
@@ -66,36 +66,51 @@ object APIAccess {
     case _ => None
   }
 
+  // ===== Mock API ==============================================
+  import util.DynamicVariable
+  import MockAPI.MockURL
+  private val _mockURL = new DynamicVariable[Option[MockURL]](None)
+
+
+  // ===== API Requests ==========================================
+  implicit val formats:DefaultFormats = DefaultFormats
+
+  /**
+   * Common HTTP Request
+   * Incorporates mocking fromURL for unit testing
+   * NB! Cannot paramterize by record type : library 'lift-json' does not provide manifest for generic List[T]
+   * @param url : url string
+   * @return    : Json object (JValue)
+   */
+  def HTTPRequest(url:String) : JValue = {
+    val json_string = _mockURL.value match {
+      // --- use mock API
+      case Some(mock) => mock.fromURL(url)
+
+      // --- use io.Source.fromURL
+      case _ => Using(io.Source.fromURL(url)) { src => src.mkString } match {
+        case Success(value) => value
+        case Failure(exception) => throw exception
+      }
+    }
+    parse(json_string)
+  }
+
   def FetchDebts(debt_id:Option[Int]=None) : List[Debt] = {
     val param = debt_id.fold("")(i => f"?id=$i")
-    Using(io.Source.fromURL(URL_Debts + param)) { src =>
-      val json = parse(src.mkString)
-      json.extract[List[Debt]]
-    } match {
-      case Success(value) => value
-      case Failure(exception) => throw exception
-    }
+    HTTPRequest(URL_Debts + param).extract[List[Debt]]
   }
 
   def FetchPaymentPlans(debt_id:Option[Int]=None) : List[PaymentPlan] = {
     val param = debt_id.fold("")(i => f"?debt_id=$i")
-    Using(io.Source.fromURL(URL_PaymentPlans + param)) { src =>
-      val json = parse(src.mkString)
-      json.extract[List[PaymentPlan]]
-    } match {
-      case Success(value) => value
-      case Failure(exception) => throw exception
-    }
+    HTTPRequest(URL_PaymentPlans + param).extract[List[PaymentPlan]]
   }
 
   def FetchPayments(payment_plan_id:Option[Int]=None) : List[Payment] = {
     val param = payment_plan_id.fold("")(i => f"?payment_plan_id=$i")
-    Using(io.Source.fromURL(URL_Payments + param)) { src =>
-      val json = parse(src.mkString)
-      json.extract[List[Payment]]
-    } match {
-      case Success(value) => value
-      case Failure(exception) => throw exception
-    }
+    HTTPRequest(URL_Payments + param).extract[List[Payment]]
   }
 }
+
+
+
