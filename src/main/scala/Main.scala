@@ -49,7 +49,7 @@ object Main extends App {
 
         val remaining_amt =
           if (payments.isEmpty) dbt.amount
-          else payments.foldLeft(0.0)((acc, pmt) => acc + pmt.amount)
+          else dbt.amount - payments.foldLeft(0.0)((acc, pmt) => acc + pmt.amount)
 
         val next_pmt_due_date = if (remaining_amt == 0) "N/A"
           else {
