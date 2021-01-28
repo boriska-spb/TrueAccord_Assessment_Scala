@@ -2,49 +2,45 @@ import java.time.LocalDate
 import java.time.Period
 import APIAccess._
 
-
 object Main extends App {
-
-  try {
-    println(args(0))
-    if (args.length > 0) {
-        Config.Init(args(0))
-    }
-
-    // ==== Basic Debt Info ===============================================
-    val debts = APIAccess.FetchDebts()
-    val rows = debts.foldRight(List[List[Any]]()) { (dbt,acc) =>
+  /**
+   * Basic Debt Info Report : id, amount, in-payment-plan
+   * @param debts : list of debt info (id, amount)
+   * @return      : list of reports rows, each containing values for report columns
+   */
+  def reportBasicDebtInfo(debts:List[Debt]) : List[List[Any]] = {
+    debts.foldRight(List[List[Any]]()) { (dbt,acc) =>
       val plan = APIAccess.FetchPaymentPlans(Some(dbt.id))
-      val new_acc = List(dbt.id,                              // id
-                         dbt.amount,                          // amount
-                         if (plan.nonEmpty) "yes" else "no")  // in payment plan
+      val new_acc = List(dbt.id,             // id
+        dbt.amount,                          // amount
+        if (plan.nonEmpty) "yes" else "no")  // in payment plan
       new_acc :: acc
     }
+  }
 
-    println
-    println("Id \tAmount    \tIn Payment Plan")
-    println("---\t----------\t---------------")
-    for (row <- rows) println("%-3s\t%-10.2f\t%-15s".format(row:_*))
-
-
-    // ======= Extended Debt Info ===========================================
-    val rows_ex = debts.foldRight(List[List[Any]]()) { (dbt,acc) =>
+  /**
+   * Extended Debt Info Report : id, amount, in-payment-plan, remaining-amount, next-payment-due-date
+   * @param debts : list of debt info (id, amount)
+   * @return      : list of reports rows, each containing values for report columns
+   */
+  def reportExtendedDebtInfo(debts:List[Debt]) : List[List[Any]] = {
+    debts.foldRight(List[List[Any]]()) { (dbt,acc) =>
       val plans = APIAccess.FetchPaymentPlans(Some(dbt.id))
       val row = if (plans.isEmpty) {
         // --- no payment plan -------------
         List(dbt.id,                // id
-             dbt.amount,            // amount
-             "no",                  // in payment plan
-             dbt.amount,            // remaining amount
-             "N/A")                 // next payment due date
+          dbt.amount,            // amount
+          "no",                  // in payment plan
+          dbt.amount,            // remaining amount
+          "N/A")                 // next payment due date
       }
       else if (plans.length > 1) {
         // --- error : has multiple payment plans
         List(dbt.id,                // id
-             dbt.amount,            // amount
-             "*multiple plans*",    // in payment plan
-             dbt.amount,            // remaining amount
-             "N/A")                 // next payment dues date
+          dbt.amount,            // amount
+          "*multiple plans*",    // in payment plan
+          dbt.amount,            // remaining amount
+          "N/A")                 // next payment dues date
       }
       else {
         // --- in payment plan ------------
@@ -67,28 +63,49 @@ object Main extends App {
                 case _ => f"*invalid installment frequency '${plan.installment_frequency}'*"
               }
             case _ => f"*invalid start date '${plan.start_date}'*"
-        }
+          }
 
         List(dbt.id,                 // id
-             dbt.amount,             // amount
-             "yes",                  // in payment plan
-             remaining_amt,          // remaining amount
-             next_pmt_due_date)      // next payment dues date
+          dbt.amount,             // amount
+          "yes",                  // in payment plan
+          remaining_amt,          // remaining amount
+          next_pmt_due_date)      // next payment dues date
       }
 
       // add row to result
       row :: acc
     }
 
-    println
-    println("Id \tAmount    \tIn Payment Plan \tRemaining Amount\tNext Payment Due")
-    println("---\t----------\t----------------\t----------------\t----------------")
-    for (row <- rows_ex)
-      println("%-3s\t%-10.2f\t%-16s\t%-16.2f\t%s".format(row:_*))
-      //println(row)
+  }
 
+  // =============== MAIN ===================================================
+  try {
+      println(args(0))
+      if (args.length > 0) {
+          Config.Init(args(0))
+      }
+
+
+
+      // ==== Basic Debt Info ===============================================
+      val debts = APIAccess.FetchDebts()
+
+      val rows = reportBasicDebtInfo(debts)
+      println
+      println("Id \tAmount    \tIn Payment Plan")
+      println("---\t----------\t---------------")
+      for (row <- rows) println("%-3s\t%-10.2f\t%-15s".format(row:_*))
+
+
+      // ======= Extended Debt Info ===========================================
+      val rows_ex = reportExtendedDebtInfo(debts)
+      println
+      println("Id \tAmount    \tIn Payment Plan \tRemaining Amount\tNext Payment Due")
+      println("---\t----------\t----------------\t----------------\t----------------")
+      for (row <- rows_ex)
+        println("%-3s\t%-10.2f\t%-16s\t%-16.2f\t%s".format(row:_*))
   }
   catch {
-    case err:Exception => println(f"***ERROR*** $err")
+      case err:Exception => println(f"***ERROR*** $err")
   }
 }
