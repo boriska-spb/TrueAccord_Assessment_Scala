@@ -1,7 +1,8 @@
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 import util.DynamicVariable
 import net.liftweb.json._
 import net.liftweb.json.DefaultFormats
-import java.time.format.DateTimeFormatter
 import java.io.FileNotFoundException
 
 /**
@@ -9,6 +10,12 @@ import java.io.FileNotFoundException
  *     Config.Init(path-to-config-file)
  */
 object Config {
+
+  // ---- Today's date : can be reset for testing purposes
+  private val _today = new DynamicVariable[LocalDate](LocalDate.now())
+  def Today:LocalDate = _today.value
+  def SetToday(today:LocalDate):Unit = _today.value = today
+
 
   // --- Values which need reset with new config path
   case class Data(RetryConnection:Int, DateFormats:List[String], URL:Map[String,String])

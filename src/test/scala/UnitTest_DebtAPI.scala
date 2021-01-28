@@ -1,5 +1,6 @@
+import java.time.LocalDate
 import org.scalatest.funsuite.AnyFunSuite
-import Config.{URL_Debts, URL_PaymentPlans, URL_Payments}
+import Config._
 import MockAPI._
 import APIAccess._
 import Main.{reportBasicDebtInfo, reportExtendedDebtInfo}
@@ -7,6 +8,10 @@ import Main.{reportBasicDebtInfo, reportExtendedDebtInfo}
 import scala.collection.mutable
 
 object APITest {//extends App {
+
+  // --- Set Today to the date of test data
+  // otherwise date calculation may produce different results form the test data used vor unit tests
+  Config.SetToday(LocalDate.of(2021,1,28))
 
   def runReportBasicInfo(debts:List[Debt]) : String = {
     try {
@@ -118,6 +123,7 @@ object TestData {
 class Test_RegressionBaseCase extends AnyFunSuite {
   test("APITest.runAll") {
     assert(APITest.runAll(None) === TestData.RegressionBaseCase)
+    println("Test RegressionBaseCase PASSED")
   }
 }
 
@@ -132,6 +138,7 @@ test("APITest.runAll") {
     val out = APITest.runAll(Some(0))
     MockAPI.ClearAllResponses()
     assert(out === TestData.DebtIsPaidOff)
+    println("Test DebtIsPaidOff PASSED")
   }
 }
 
@@ -146,6 +153,7 @@ class Test_NoData_Debts extends AnyFunSuite {
     val out = APITest.runAll(None)
     MockAPI.ClearAllResponses()
     assert(out === TestData.NoData_Debts)
+    println("Test NoData_Debts PASSED")
   }
 }
 
@@ -160,6 +168,7 @@ class Test_NoData_PaymentPlans extends AnyFunSuite {
     val out = APITest.runAll(Some(0))
     MockAPI.ClearAllResponses()
     assert(out === TestData.NoData_PaymentPlans)
+    println("Test NoData_PaymentPlans PASSED")
   }
 }
 
@@ -175,6 +184,7 @@ class Test_NoData_Payments extends AnyFunSuite {
     val out = APITest.runReportExtendedInfo(debts)
     MockAPI.ClearAllResponses()
     assert(out === TestData.NoData_Payments)
+    println("Test NoData_Payments PASSED")
   }
 }
 
@@ -189,6 +199,7 @@ class Test_InvalidDebtAmount extends AnyFunSuite {
     val out = APITest.runAll(Some(0))
     MockAPI.ClearAllResponses()
     assert(out === TestData.InvalidDebtAmount)
+    println("Test InvalidDebtAmount PASSED")
   }
 }
 
@@ -220,6 +231,7 @@ class Test_MultiplePaymentPlans extends AnyFunSuite {
     val out = APITest.runAll(Some(0))
     MockAPI.ClearAllResponses()
     assert(out === TestData.MultiplePaymentPlans)
+    println("Test MultiplePaymentPlans PASSED")
   }
 }
 class Test_InvalidPaymentPlanStartDate extends AnyFunSuite {
@@ -242,8 +254,10 @@ class Test_InvalidPaymentPlanStartDate extends AnyFunSuite {
     val out = APITest.runAll(Some(0))
     MockAPI.ClearAllResponses()
     assert(out === TestData.InvalidPaymentPlanStartDate)
+    println("Test InvalidPaymentPlanStartDate PASSED")
   }
 }
+
 class Test_InvalidPaymentPlanInstallmentFrequency extends AnyFunSuite {
   test("APITest.runAll") {
     APIAccess.SetMockURL(mock = true)
@@ -264,6 +278,7 @@ class Test_InvalidPaymentPlanInstallmentFrequency extends AnyFunSuite {
     val out = APITest.runAll(Some(0))
     MockAPI.ClearAllResponses()
     assert(out === TestData.InvalidPaymentPlanInstallmentFrequency)
+    println("Test InvalidPaymentPlanInstallmentFrequency PASSED")
   }
 }
 
@@ -291,6 +306,7 @@ class Test_InvalidPaymentAmount extends AnyFunSuite {
     val out = APITest.runReportExtendedInfo(debts)
     MockAPI.ClearAllResponses()
     assert(out === TestData.InvalidPaymentAmount)
+    println("Test InvalidPaymentAmount PASSED")
   }
 }
 
