@@ -1,6 +1,6 @@
 {
   "RetryConnection": 3,
-  "DateFormats" : [ "%Y-%m-%dT%H:%M:%SZ", "%Y-%m-%d" ],
+  "DateFormats" : [ "yyyy-MM-dd'T'HH:mm:ssZ", "yyyy-mm-dd" ],
   "URL": {
     "Debts": "https://my-json-server.typicode.com/druska/trueaccord-mock-payments-api/debts",
     "PaymentPlans":  "https://my-json-server.typicode.com/druska/trueaccord-mock-payments-api/payment_plans",
