@@ -1,4 +1,5 @@
 import scala.collection.mutable.{Map => MutableMap}
+import APIAccess._
 
 object MockAPI {
 
@@ -9,11 +10,13 @@ object MockAPI {
 
   /**
    *  Mocked io.source.fromURL : url => json-string
-   *  For simplicity, we return String rather than BufferedIterator over Char (as in io.source.fromURL)
+   *  If url not found in reponses, return None
+   *  For simplicity, we return String rather than BufferedIterator (as in io.source.fromURL)
    */
-  val fromURL : String => String = (url:String) => _responses(url)
+  val fromURL : String => Option[String] = (url:String) => _responses.get(url)
 
   def AddResponse(url:String, json:String) : Unit = _responses(url) = json
   def ClearResponse(url:String) : Unit = _responses.remove(url)
   def ClearAllResponses():Unit = _responses.clear()
+
 }

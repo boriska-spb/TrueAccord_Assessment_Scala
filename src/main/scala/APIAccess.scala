@@ -74,8 +74,8 @@ object APIAccess {
    * Optional mock function : URL => response as JSON string
    * SetMockURL : defaults to MockAPI.fromURL
    */
-  private val _mockURL = new DynamicVariable[Option[String => String]](None)
-  def SetMockURL(mock:Boolean, mockFunction:String=>String=fromURL):Unit =
+  private val _mockURL = new DynamicVariable[Option[String => Option[String]]](None)
+  def SetMockURL(mock:Boolean, mockFunction:String=>Option[String]=fromURL):Unit =
     _mockURL.value = if (mock) Some(fromURL) else None
 
 
@@ -90,17 +90,27 @@ object APIAccess {
    * @return    : Json object (JValue)
    */
   def HTTPRequest(url:String) : JValue = {
-    val json_string = _mockURL.value match {
-      // --- use mock API
-      case Some(mock) => mock(url)
 
-      // --- use io.Source.fromURL
-      case _ => Using(io.Source.fromURL(url)) { src => src.mkString } match {
-        case Success(value) => value
-        case Failure(exception) => throw exception
+      // try mock API
+      val mock_response: Option[String] = _mockURL.value.flatMap(mock => mock(url))
+      val json_string = mock_response match {
+        // --- use mock response
+        case Some(json) => json
+
+        // --- use io.Source.fromURL
+        case _ => Using(io.Source.fromURL(url)) { src => src.mkString } match {
+          case Success(value) => value
+          case Failure(exception) =>
+            throw new Exception(f"Error fetching data from API '$url' : ${exception.getMessage}")
+        }
       }
+    try {
+      parse(json_string)
     }
-    parse(json_string)
+    catch {
+      case err:Exception =>
+        throw new Exception(f"Error parsing JSON response from API '$url' : $json_string")
+    }
   }
 
   def FetchDebts(debt_id:Option[Int]=None) : List[Debt] = {
