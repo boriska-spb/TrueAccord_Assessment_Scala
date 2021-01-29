@@ -51,7 +51,16 @@ object Main extends App {
 
         val remaining_amt =
           if (payments.isEmpty) dbt.amount
-          else dbt.amount - payments.foldLeft(0.0)((acc, pmt) => acc + pmt.amount)
+            else {
+            def pmt_date(pmt: Payment): LocalDate = APIAccess.ParseDateOpt(pmt.date) match {
+              case Some(date) => date
+              case _ => throw new Exception(f"*invalid payment date for f$pmt")
+            }
+
+            dbt.amount - payments.
+                         filter(pmt_date(_).isBefore(Config.Today)).
+                         foldLeft(0.0)((acc, pmt) => acc + pmt.amount)
+          }
 
         val next_pmt_due_date = if (remaining_amt == 0) "N/A"
           else {
