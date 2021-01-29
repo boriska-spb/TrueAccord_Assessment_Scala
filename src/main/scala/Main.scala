@@ -51,7 +51,7 @@ object Main extends App {
 
         val remaining_amt =
           if (payments.isEmpty) dbt.amount
-            else {
+          else {
             def pmt_date(pmt: Payment): LocalDate = APIAccess.ParseDateOpt(pmt.date) match {
               case Some(date) => date
               case _ => throw new Exception(f"*invalid payment date for f$pmt")
