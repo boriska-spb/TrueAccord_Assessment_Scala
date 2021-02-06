@@ -1,3 +1,14 @@
 1611724920573:;set _root_.scala.collection.Seq(historyPath := None,shellPrompt := { _ => "" },SettingKey[_root_.scala.Option[_root_.sbt.File]]("sbtStructureOutputFile") in _root_.sbt.Global := _root_.scala.Some(_root_.sbt.file("C:/Users/boris/AppData/Local/Temp/sbt-structure.xml")),SettingKey[_root_.java.lang.String]("sbtStructureOptions") in _root_.sbt.Global := "download, resolveClassifiers");apply -cp "C:/Users/boris/AppData/Roaming/JetBrains/IntelliJIdea2020.3/plugins/Scala/repo/org.jetbrains/sbt-structure-extractor/scala_2.12/sbt_1.0/2020.3/jars/sbt-structure-extractor.jar" org.jetbrains.sbt.CreateTasks;*/*:dumpStructure
 1612576182504:~run
 1612576725342:;set _root_.scala.collection.Seq(historyPath := None,shellPrompt := { _ => "" },SettingKey[_root_.scala.Option[_root_.sbt.File]]("sbtStructureOutputFile") in _root_.sbt.Global := _root_.scala.Some(_root_.sbt.file("C:/Users/boris/AppData/Local/Temp/sbt-structure.xml")),SettingKey[_root_.java.lang.String]("sbtStructureOptions") in _root_.sbt.Global := "download, resolveClassifiers");apply -cp "C:/Users/boris/AppData/Roaming/JetBrains/IntelliJIdea2020.3/plugins/Scala/repo/org.jetbrains/sbt-structure-extractor/scala_2.12/sbt_1.0/2020.3/jars/sbt-structure-extractor.jar" org.jetbrains.sbt.CreateTasks;*/*:dumpStructure
+1612577683627:run Main.scala
+1612577690998:exit
+1612577718985:run Main.scala
+1612577736834:run Main.scala C:\\SCALA\\Projects\\TrueAccord_Assessment_Scala\\src\\main\\scala
+1612577763495:run Main.scala C:\\SCALA\\Projects\\TrueAccord_Assessment_Scala\\src\\main\\scala\\debt_config.json
+1612577813613:run Main.scala C:\\\\SCALA\\\\Projects\\\\TrueAccord_Assessment_Scala\\\\src\\\\main\\\\scala\\\\config.json
+1612577825843:run Main.scala C:\\\\SCALA\\\\Projects\\\\TrueAccord_Assessment_Scala\\\\src\\\\main\\\\scala\\\\debt_config.json
+1612578047847:run Main.scala src\\\\main\\\\scala\\\\debt_config.json
+1612578355689:exit
+1612638212856:test APITest
+1612638226374:test

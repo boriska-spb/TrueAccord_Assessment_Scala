@@ -102,7 +102,7 @@ object TestData {
 
   val InvalidPaymentPlanInstallmentFrequency: String =
   """0    123.460 yes
-    |0    123.460 yes     20.960 *invalid start date '2020-09'*
+    |0    123.460 yes     20.960 *invalid installment frequency 'MONTHLY'*
     |""".stripMargin
 
   val InvalidPaymentAmount: String =
@@ -120,15 +120,14 @@ object TestData {
 
 }
 
-class Test_RegressionBaseCase extends AnyFunSuite {
-  test("APITest.runAll") {
+class DebtAPI_UnitTest extends AnyFunSuite {
+
+  test("RegressionBaseCase") {
     assert(APITest.runAll(None) === TestData.RegressionBaseCase)
     println("Test RegressionBaseCase PASSED")
   }
-}
 
-class Test_DebtIsPaidOff extends AnyFunSuite {
-test("APITest.runAll") {
+  test("DebtIsPaidOff") {
     APIAccess.SetMockURL(mock = true)
 
     // FIX : for debt_id=0, total payment amount = 102.5
@@ -140,10 +139,8 @@ test("APITest.runAll") {
     assert(out === TestData.DebtIsPaidOff)
     println("Test DebtIsPaidOff PASSED")
   }
-}
 
-class Test_NoData_Debts extends AnyFunSuite {
-  test("APITest.runAll") {
+  test("NoData_Debts") {
     APIAccess.SetMockURL(mock = true)
 
     // FIX : empty list for Debts API
@@ -155,10 +152,8 @@ class Test_NoData_Debts extends AnyFunSuite {
     assert(out === TestData.NoData_Debts)
     println("Test NoData_Debts PASSED")
   }
-}
 
-class Test_NoData_PaymentPlans extends AnyFunSuite {
-  test("APITest.runAll") {
+  test("NoData_PaymentPlans") {
     APIAccess.SetMockURL(mock = true)
 
     // FIX : empty list for PaymentPlans API
@@ -170,10 +165,8 @@ class Test_NoData_PaymentPlans extends AnyFunSuite {
     assert(out === TestData.NoData_PaymentPlans)
     println("Test NoData_PaymentPlans PASSED")
   }
-}
 
-class Test_NoData_Payments extends AnyFunSuite {
-  test("APITest.runAll") {
+  test("NoData_Payments") {
     APIAccess.SetMockURL(mock = true)
 
     // FIX Payments API: empty list for payment_plan_id=0 (=> debt_id = 0)
@@ -186,10 +179,8 @@ class Test_NoData_Payments extends AnyFunSuite {
     assert(out === TestData.NoData_Payments)
     println("Test NoData_Payments PASSED")
   }
-}
 
-class Test_InvalidDebtAmount extends AnyFunSuite {
-  test("APITest.runAll") {
+  test("InvalidDebtAmount") {
     APIAccess.SetMockURL(mock = true)
 
     // FIX : set invalid debt amount for debt_id=0
@@ -201,10 +192,8 @@ class Test_InvalidDebtAmount extends AnyFunSuite {
     assert(out === TestData.InvalidDebtAmount)
     println("Test InvalidDebtAmount PASSED")
   }
-}
 
-class Test_MultiplePaymentPlans extends AnyFunSuite {
-  test("APITest.runAll") {
+  test("MultiplePaymentPlans") {
     APIAccess.SetMockURL(mock = true)
 
     // FIX PaymentPlans API : multiple payment plans for debt id = 0
@@ -233,9 +222,8 @@ class Test_MultiplePaymentPlans extends AnyFunSuite {
     assert(out === TestData.MultiplePaymentPlans)
     println("Test MultiplePaymentPlans PASSED")
   }
-}
-class Test_InvalidPaymentPlanStartDate extends AnyFunSuite {
-  test("APITest.runAll") {
+
+  test("InvalidPaymentPlanStartDate") {
     APIAccess.SetMockURL(mock = true)
 
     // FIX PaymentPlans : set invalid start date amount for debt_id=0
@@ -256,10 +244,8 @@ class Test_InvalidPaymentPlanStartDate extends AnyFunSuite {
     assert(out === TestData.InvalidPaymentPlanStartDate)
     println("Test InvalidPaymentPlanStartDate PASSED")
   }
-}
 
-class Test_InvalidPaymentPlanInstallmentFrequency extends AnyFunSuite {
-  test("APITest.runAll") {
+  test("InvalidPaymentPlanInstallmentFrequency") {
     APIAccess.SetMockURL(mock = true)
 
     // FIX PaymentPlans : set invalid installment frequency for debt_id=0
@@ -271,7 +257,7 @@ class Test_InvalidPaymentPlanInstallmentFrequency extends AnyFunSuite {
     |    "id": 0,
     |    "installment_amount": 51.25,
     |    "installment_frequency": "MONTHLY",
-    |    "start_date": "2020-09"
+    |    "start_date": "2020-09-28"
     |  }]""".stripMargin
 
     MockAPI.AddResponse(url, json)
@@ -280,10 +266,8 @@ class Test_InvalidPaymentPlanInstallmentFrequency extends AnyFunSuite {
     assert(out === TestData.InvalidPaymentPlanInstallmentFrequency)
     println("Test InvalidPaymentPlanInstallmentFrequency PASSED")
   }
-}
 
-class Test_InvalidPaymentAmount extends AnyFunSuite {
-  test("APITest.runAll") {
+  test("InvalidPaymentAmount") {
     APIAccess.SetMockURL(mock = true)
 
     // FIX Payments : set invalid payment amount for payment_plan_id = 0 ( => debt_id=0)

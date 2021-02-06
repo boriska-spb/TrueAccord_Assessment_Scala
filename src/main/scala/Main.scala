@@ -93,8 +93,8 @@ object Main extends App {
   // =============== MAIN ===================================================
   try {
 
-      if (args.length > 0) {
-          Config.Init(args(0))
+      if (args.length > 1) {
+          Config.Init(args(1))
       }
 
       // === Set today to current date
