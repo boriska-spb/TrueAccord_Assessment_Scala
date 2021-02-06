@@ -3,6 +3,11 @@ mobile 646-244-6653
 
 GITHUB REPOSITORY : https://github.com/boriska-spb/TrueAccordAssessment_Scala
 
+RUN IN SBT SHELL :
+Command lines in sbt shell :
+run Main.scala
+run Main.scala src//main//scala//debt_config.json
+
 
 TASKS
 ======
