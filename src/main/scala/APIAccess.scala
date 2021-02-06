@@ -76,7 +76,7 @@ object APIAccess {
    */
   private val _mockURL = new DynamicVariable[Option[String => Option[String]]](None)
   def SetMockURL(mock:Boolean, mockFunction:String=>Option[String]=fromURL):Unit =
-    _mockURL.value = if (mock) Some(fromURL) else None
+    _mockURL.value = if (mock) Some(mockFunction) else None
 
 
   // ===== API Requests ==========================================
@@ -104,13 +104,13 @@ object APIAccess {
             throw new Exception(f"Error fetching data from API '$url' : ${exception.getMessage}")
         }
       }
-    try {
-      parse(json_string)
-    }
-    catch {
-      case err:Exception =>
-        throw new Exception(f"Error parsing JSON response from API '$url' : $json_string")
-    }
+      try {
+        parse(json_string)
+      }
+      catch {
+        case err:Exception =>
+          throw new Exception(f"Error parsing JSON response from API '$url' : $json_string")
+      }
   }
 
   def FetchDebts(debt_id:Option[Int]=None) : List[Debt] = {

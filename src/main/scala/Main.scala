@@ -13,10 +13,10 @@ object Main extends App {
   def reportBasicDebtInfo(debts:List[Debt]) : List[List[Any]] = {
     debts.foldRight(List[List[Any]]()) { (dbt,acc) =>
       val plan = APIAccess.FetchPaymentPlans(Some(dbt.id))
-      val new_acc = List(dbt.id,             // id
-        dbt.amount,                          // amount
-        if (plan.nonEmpty) "yes" else "no")  // in payment plan
-      new_acc :: acc
+      val row = List(dbt.id,                              // id
+                     dbt.amount,                          // amount
+                     if (plan.nonEmpty) "yes" else "no")  // in payment plan
+      row :: acc
     }
   }
 
@@ -30,19 +30,19 @@ object Main extends App {
       val plans = APIAccess.FetchPaymentPlans(Some(dbt.id))
       val row = if (plans.isEmpty) {
         // --- no payment plan -------------
-        List(dbt.id,          // id
-          dbt.amount,         // amount
-          "no",               // in payment plan
-          dbt.amount,         // remaining amount
-          "N/A")              // next payment due date
+        List(dbt.id,             // id
+             dbt.amount,         // amount
+             "no",               // in payment plan
+             dbt.amount,         // remaining amount
+             "N/A")              // next payment due date
       }
       else if (plans.length > 1) {
         // --- error : has multiple payment plans
-        List(dbt.id,          // id
-          dbt.amount,         // amount
-          "*multiple plans*", // in payment plan
-          dbt.amount,         // remaining amount
-          "N/A")              // next payment due date
+        List(dbt.id,             // id
+             dbt.amount,         // amount
+             "*multiple plans*", // in payment plan
+             dbt.amount,         // remaining amount
+             "N/A")              // next payment due date
       }
       else {
         // --- in payment plan ------------
@@ -78,11 +78,11 @@ object Main extends App {
             }
           }
 
-          List(dbt.id,         // id
-            dbt.amount,        // amount
-            "yes",             // in payment plan
-            remaining_amt,     // remaining amount
-            next_pmt_due_date) // next payment dues date
+          List(dbt.id,            // id
+               dbt.amount,        // amount
+               "yes",             // in payment plan
+               remaining_amt,     // remaining amount
+               next_pmt_due_date) // next payment dues date
       }
 
       // add row to result
